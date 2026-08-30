@@ -112,22 +112,22 @@ export default function ActivityForm() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      <nav className="bg-white shadow-sm px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button onClick={() => navigate('/')} className="text-gray-500 hover:text-gray-900">
+      <nav className="bg-white shadow-sm px-4 md:px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
+        <div className="flex items-center gap-4 w-full md:w-auto">
+          <button onClick={() => navigate('/')} className="text-gray-500 hover:text-gray-900 bg-gray-100 md:bg-transparent p-2 md:p-0 rounded-full">
             <ArrowLeft size={24} />
           </button>
-          <h1 className="text-xl font-bold text-gray-800">
+          <h1 className="text-xl font-bold text-gray-800 text-center w-full md:text-left md:w-auto pr-8 md:pr-0">
             {isViewMode ? 'Detalhe da Atividade' : 'Nova Atividade'}
           </h1>
         </div>
         
-        <div className="flex gap-3">
+        <div className="flex flex-wrap md:flex-nowrap gap-2 md:gap-3 w-full md:w-auto justify-center md:justify-end">
           {isViewMode && atividadeCarregada && (
             <PDFDownloadLink
               document={<ActivityPDF atividade={atividadeCarregada.atividade} avaliacoes={atividadeCarregada.avaliacoes} />}
               fileName={`atividade_${atividadeCarregada.atividade.data}.pdf`}
-              className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+              className="flex justify-center items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg md:rounded hover:bg-green-700 transition flex-1 md:flex-none whitespace-nowrap"
             >
               {({ loading }) => (
                 <>
@@ -141,7 +141,7 @@ export default function ActivityForm() {
           {isViewMode && (
             <button
               onClick={duplicarAtividade}
-              className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition"
+              className="flex justify-center items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg md:rounded hover:bg-indigo-700 transition flex-1 md:flex-none whitespace-nowrap"
               title="Copia os textos para um novo dia vazio"
             >
               <Copy size={18} />
@@ -153,7 +153,7 @@ export default function ActivityForm() {
             <button
               onClick={handleSubmit(onSubmit)}
               disabled={loading}
-              className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
+              className="flex justify-center items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg md:rounded hover:bg-blue-700 transition disabled:opacity-50 w-full md:w-auto whitespace-nowrap"
             >
               <Save size={18} />
               {loading ? 'A guardar...' : 'Guardar'}
@@ -162,9 +162,9 @@ export default function ActivityForm() {
         </div>
       </nav>
 
-      <main className="max-w-5xl mx-auto px-6 py-8">
-        <form className="bg-white rounded-lg shadow-sm p-8 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <main className="max-w-5xl mx-auto px-4 md:px-6 py-6 md:py-8">
+        <form className="bg-white rounded-lg shadow-sm border md:border-none border-gray-200 p-4 md:p-8 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Data</label>
               <input
