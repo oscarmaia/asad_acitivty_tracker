@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { ArrowLeft, Save, Copy, FileText, Plus, Trash2 } from 'lucide-react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
@@ -23,6 +23,7 @@ type FormValues = AtividadeData & {
 export default function ActivityForm() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { state } = useLocation();
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
   const [utentesDb, setUtentesDb] = useState<any[]>([]);
@@ -36,6 +37,7 @@ export default function ActivityForm() {
     handleSubmit,
     reset,
     getValues,
+    setValue,
     formState: { isDirty },
   } = useForm<FormValues>({
     defaultValues: {
@@ -60,11 +62,22 @@ export default function ActivityForm() {
       await carregarDadosBase();
       if (id) {
         await carregarAtividade(id);
+      } else if (state && state.cloneFrom) {
+        try {
+          const { atividade } = await atividadesService.getAtividade(state.cloneFrom);
+          reset({
+            ...atividade,
+            data: format(new Date(), 'yyyy-MM-dd'),
+            avaliacoes: [],
+          });
+        } catch (err) {
+          console.error('Erro ao clonar atividade', err);
+        }
       }
       setPageLoading(false);
     };
     fetchData();
-  }, [id]);
+  }, [id, state]);
 
   const carregarDadosBase = async () => {
     try {
@@ -91,7 +104,10 @@ export default function ActivityForm() {
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
     try {
-      const { avaliacoes, ...atividadeData } = data;
+      const { avaliacoes, ...restData } = data;
+      // Remover o id do payload para garantir que o clone cria uma nova atividade
+      const { id: formId, ...atividadeData } = restData as any;
+      
       if (id) {
         await atividadesService.atualizarAtividadeComAvaliacoes(id, atividadeData, avaliacoes);
       } else {
@@ -348,7 +364,13 @@ export default function ActivityForm() {
                     <div className="col-span-1 md:col-span-2 flex items-center justify-between md:justify-center">
                       <span className="md:hidden text-sm text-gray-500">Participação</span>
                       <select
-                        {...register(`avaliacoes.${index}.grau_participacao`)}
+                        {...register(`avaliacoes.${index}.grau_participacao`, {
+                          onChange: (e) => {
+                            const val = e.target.value as any;
+                            setValue(`avaliacoes.${index}.interesse_demonstrado`, val, { shouldDirty: true });
+                            setValue(`avaliacoes.${index}.alcance_objetivos`, val, { shouldDirty: true });
+                          }
+                        })}
                         className="border rounded p-1.5 text-sm w-20 md:w-16 text-center bg-white"
                       >
                         {notas.map(n => <option key={n} value={n}>{n}</option>)}

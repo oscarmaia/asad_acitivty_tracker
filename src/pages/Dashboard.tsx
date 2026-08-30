@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { atividadesService } from '../services/atividades';
-import { Link } from 'react-router-dom';
-import { LogOut, PlusCircle, Search } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { LogOut, PlusCircle, Search, Edit2, Copy, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function Dashboard() {
   const { signOut, user } = useAuth();
+  const navigate = useNavigate();
   const [atividades, setAtividades] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,6 +25,25 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDelete = async (id: string) => {
+    const confirmDelete = window.confirm('Tem a certeza que deseja excluir esta atividade? Esta ação não pode ser desfeita.');
+    if (!confirmDelete) return;
+
+    try {
+      setLoading(true);
+      await atividadesService.deleteAtividade(id);
+      await loadAtividades();
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao excluir atividade.');
+      setLoading(false);
+    }
+  };
+
+  const handleDuplicate = (id: string) => {
+    navigate('/atividade/nova', { state: { cloneFrom: id } });
   };
 
   const filteredAtividades = atividades.filter(
@@ -115,10 +135,28 @@ export default function Dashboard() {
                   </div>
 
                   {/* Ações */}
-                  <div className="col-span-1 md:col-span-1 flex justify-end md:block pt-2 md:pt-0">
-                    <Link to={`/atividade/${atividade.id}`} className="text-blue-600 hover:text-blue-900 text-sm font-medium w-full md:w-auto text-center md:text-right block">
-                      <span className="bg-blue-50 md:bg-transparent px-4 py-2 md:p-0 rounded-md block">Ver / Editar</span>
+                  <div className="col-span-1 md:col-span-1 flex justify-end md:justify-end items-center gap-2 pt-2 md:pt-0">
+                    <button 
+                      onClick={() => handleDuplicate(atividade.id)}
+                      className="p-1.5 md:p-2 text-indigo-600 hover:bg-indigo-50 rounded-md transition" 
+                      title="Duplicar"
+                    >
+                      <Copy size={18} />
+                    </button>
+                    <Link 
+                      to={`/atividade/${atividade.id}`} 
+                      className="p-1.5 md:p-2 text-blue-600 hover:bg-blue-50 rounded-md transition" 
+                      title="Ver / Editar"
+                    >
+                      <Edit2 size={18} />
                     </Link>
+                    <button 
+                      onClick={() => handleDelete(atividade.id)}
+                      className="p-1.5 md:p-2 text-red-600 hover:bg-red-50 rounded-md transition" 
+                      title="Excluir"
+                    >
+                      <Trash2 size={18} />
+                    </button>
                   </div>
                 </div>
               ))}
