@@ -114,9 +114,13 @@ export default function ActivityForm() {
         await atividadesService.criarAtividadeComAvaliacoes(atividadeData, avaliacoes);
       }
       navigate('/');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('Erro ao guardar atividade.');
+      if (err.message === 'UNIQUE_CONSTRAINT') {
+        alert('Já existe uma atividade registada com exatamente a mesma Data, Local, Duração e Nome. Por favor, altere algum destes campos para evitar duplicados.');
+      } else {
+        alert('Erro ao guardar atividade.');
+      }
     } finally {
       setLoading(false);
     }

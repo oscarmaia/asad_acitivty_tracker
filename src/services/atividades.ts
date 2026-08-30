@@ -67,11 +67,34 @@ export const atividadesService = {
     return { atividade, avaliacoes };
   },
 
+  async checkUniqueness(atividade: AtividadeData, excludeId?: string) {
+    let query = supabase
+      .from('atividades')
+      .select('id')
+      .eq('data', atividade.data)
+      .eq('local', atividade.local)
+      .eq('duracao', atividade.duracao)
+      .eq('atividade_nome', atividade.atividade_nome);
+
+    if (excludeId) {
+      query = query.neq('id', excludeId);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    
+    if (data && data.length > 0) {
+      throw new Error('UNIQUE_CONSTRAINT');
+    }
+  },
+
   /**
    * Insere uma Atividade e as suas Avaliações numa única transação "simulada" 
    * ou duas queries seguidas (como é cliente frontend, fazemos em 2 passos seguidos).
    */
   async criarAtividadeComAvaliacoes(atividade: AtividadeData, avaliacoes: AvaliacaoData[]) {
+    await this.checkUniqueness(atividade);
+
     // 1. Inserir a Atividade e obter o ID retornado
     const { data: atividadeInserida, error: erroAtividade } = await supabase
       .from('atividades')
@@ -107,6 +130,8 @@ export const atividadesService = {
   },
 
   async atualizarAtividadeComAvaliacoes(id: string, atividade: AtividadeData, avaliacoes: AvaliacaoData[]) {
+    await this.checkUniqueness(atividade, id);
+
     // 1. Atualizar a Atividade
     const { error: erroAtividade } = await supabase
       .from('atividades')
