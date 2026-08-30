@@ -4,6 +4,7 @@ import { atividadesService } from '../services/atividades';
 import { Link, useNavigate } from 'react-router-dom';
 import { LogOut, PlusCircle, Search, Edit2, Copy, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
+import toast from 'react-hot-toast';
 
 export default function Dashboard() {
   const { signOut, user } = useAuth();
@@ -22,6 +23,7 @@ export default function Dashboard() {
       setAtividades(data);
     } catch (error) {
       console.error('Erro ao carregar atividades', error);
+      toast.error('Erro ao carregar a lista de atividades.');
     } finally {
       setLoading(false);
     }
@@ -34,10 +36,11 @@ export default function Dashboard() {
     try {
       setLoading(true);
       await atividadesService.deleteAtividade(id);
+      toast.success('Atividade excluída com sucesso!');
       await loadAtividades();
     } catch (err) {
       console.error(err);
-      alert('Erro ao excluir atividade.');
+      toast.error('Erro ao excluir atividade.');
       setLoading(false);
     }
   };

@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import { utentesService } from '../services/utentes';
 import type { UtenteData } from '../services/utentes';
 import { Link } from 'react-router-dom';
-import { Edit2, PlusCircle, Check, X, Save } from 'lucide-react';
+import { Edit2, PlusCircle, Check, X, Save, ArrowLeft, LogOut, Search } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function Utentes() {
+  const { signOut } = useAuth();
   const [utentes, setUtentes] = useState<UtenteData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   
   // Estado para o formulário / edição inline ou modal
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -23,6 +27,7 @@ export default function Utentes() {
       setUtentes(data);
     } catch (error) {
       console.error('Erro ao carregar utentes', error);
+      toast.error('Erro ao carregar lista de utentes.');
     } finally {
       setLoading(false);
     }
@@ -47,17 +52,18 @@ export default function Utentes() {
 
   const handleSave = async () => {
     if (!formData.nome || !formData.apelido) {
-      alert('Preencha o nome e o apelido.');
+      toast.error('Preencha o nome e o apelido.');
       return;
     }
     
     try {
       await utentesService.saveUtente(formData);
+      toast.success(editingId ? 'Utente atualizado!' : 'Utente adicionado!');
       await loadUtentes();
       handleCancel();
     } catch (error) {
       console.error(error);
-      alert('Erro ao guardar utente.');
+      toast.error('Erro ao guardar utente.');
     }
   };
 

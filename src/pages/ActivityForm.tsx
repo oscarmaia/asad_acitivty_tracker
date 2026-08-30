@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { ArrowLeft, Save, Copy, FileText, Plus, Trash2 } from 'lucide-react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
+import toast from 'react-hot-toast';
 import { atividadesService } from '../services/atividades';
 import type { AtividadeData } from '../services/atividades';
 import { ActivityPDF } from '../components/ActivityPDF';
@@ -72,6 +73,7 @@ export default function ActivityForm() {
           });
         } catch (err) {
           console.error('Erro ao clonar atividade', err);
+          toast.error('Não foi possível clonar a atividade.');
         }
       }
       setPageLoading(false);
@@ -85,6 +87,7 @@ export default function ActivityForm() {
       setUtentesDb(uts);
     } catch (err) {
       console.error('Erro ao carregar utentes', err);
+      toast.error('Erro ao carregar lista de utentes.');
     }
   };
 
@@ -98,6 +101,7 @@ export default function ActivityForm() {
       });
     } catch (err) {
       console.error('Erro ao carregar atividade', err);
+      toast.error('Erro ao carregar os dados da atividade.');
     }
   };
 
@@ -110,16 +114,18 @@ export default function ActivityForm() {
       
       if (id) {
         await atividadesService.atualizarAtividadeComAvaliacoes(id, atividadeData, avaliacoes);
+        toast.success('Atividade atualizada com sucesso!');
       } else {
         await atividadesService.criarAtividadeComAvaliacoes(atividadeData, avaliacoes);
+        toast.success('Atividade criada com sucesso!');
       }
       navigate('/');
     } catch (err: any) {
       console.error(err);
       if (err.message === 'UNIQUE_CONSTRAINT') {
-        alert('Já existe uma atividade registada com exatamente a mesma Data, Local, Duração e Nome. Por favor, altere algum destes campos para evitar duplicados.');
+        toast.error('Já existe uma atividade registada com exatamente a mesma Data, Local, Duração e Nome. Por favor, altere algum destes campos.', { duration: 6000 });
       } else {
-        alert('Erro ao guardar atividade.');
+        toast.error('Erro ao guardar atividade.');
       }
     } finally {
       setLoading(false);
@@ -147,10 +153,11 @@ export default function ActivityForm() {
     setLoading(true);
     try {
       await atividadesService.deleteAtividade(id);
+      toast.success('Atividade excluída!');
       navigate('/');
     } catch (err) {
       console.error(err);
-      alert('Erro ao excluir atividade.');
+      toast.error('Erro ao excluir atividade.');
       setLoading(false);
     }
   };
