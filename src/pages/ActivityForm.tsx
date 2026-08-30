@@ -24,6 +24,7 @@ export default function ActivityForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
   const [utentesDb, setUtentesDb] = useState<any[]>([]);
   const [atividadeCarregada, setAtividadeCarregada] = useState<any>(null);
   
@@ -35,6 +36,7 @@ export default function ActivityForm() {
     handleSubmit,
     reset,
     getValues,
+    formState: { isDirty },
   } = useForm<FormValues>({
     defaultValues: {
       data: format(new Date(), 'yyyy-MM-dd'),
@@ -53,10 +55,15 @@ export default function ActivityForm() {
   });
 
   useEffect(() => {
-    carregarDadosBase();
-    if (id) {
-      carregarAtividade(id);
-    }
+    const fetchData = async () => {
+      setPageLoading(true);
+      await carregarDadosBase();
+      if (id) {
+        await carregarAtividade(id);
+      }
+      setPageLoading(false);
+    };
+    fetchData();
   }, [id]);
 
   const carregarDadosBase = async () => {
@@ -82,12 +89,14 @@ export default function ActivityForm() {
   };
 
   const onSubmit = async (data: FormValues) => {
-    if (isViewMode) return; // Por enquanto, não permitimos editar após guardar para simplificar (requisito fala em registo e duplicação)
-    
     setLoading(true);
     try {
       const { avaliacoes, ...atividadeData } = data;
-      await atividadesService.criarAtividadeComAvaliacoes(atividadeData, avaliacoes);
+      if (id) {
+        await atividadesService.atualizarAtividadeComAvaliacoes(id, atividadeData, avaliacoes);
+      } else {
+        await atividadesService.criarAtividadeComAvaliacoes(atividadeData, avaliacoes);
+      }
       navigate('/');
     } catch (err) {
       console.error(err);
@@ -110,6 +119,31 @@ export default function ActivityForm() {
 
   const notas = ['MB', 'B', 'S', 'PS', 'I'];
 
+  const handleDelete = async () => {
+    if (!id) return;
+    const confirmDelete = window.confirm('Tem a certeza que deseja excluir esta atividade? Esta ação não pode ser desfeita.');
+    if (!confirmDelete) return;
+
+    setLoading(true);
+    try {
+      await atividadesService.deleteAtividade(id);
+      navigate('/');
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao excluir atividade.');
+      setLoading(false);
+    }
+  };
+
+  if (pageLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+        <p className="text-gray-500 font-medium">A carregar a atividade...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       <nav className="bg-white shadow-sm px-4 md:px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
@@ -123,6 +157,17 @@ export default function ActivityForm() {
         </div>
         
         <div className="flex flex-wrap md:flex-nowrap gap-2 md:gap-3 w-full md:w-auto justify-center md:justify-end">
+          {isViewMode && (
+            <button
+              onClick={handleDelete}
+              className="flex justify-center items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg md:rounded hover:bg-red-700 transition flex-1 md:flex-none whitespace-nowrap"
+              title="Excluir esta atividade permanentemente"
+            >
+              <Trash2 size={18} />
+              Excluir
+            </button>
+          )}
+
           {isViewMode && atividadeCarregada && (
             <PDFDownloadLink
               document={<ActivityPDF atividade={atividadeCarregada.atividade} avaliacoes={atividadeCarregada.avaliacoes} />}
@@ -149,7 +194,7 @@ export default function ActivityForm() {
             </button>
           )}
           
-          {!isViewMode && (
+          {(!isViewMode || isDirty) && (
             <button
               onClick={handleSubmit(onSubmit)}
               disabled={loading}
@@ -170,7 +215,6 @@ export default function ActivityForm() {
               <input
                 type="date"
                 {...register('data', { required: true })}
-                disabled={isViewMode}
                 className="w-full border rounded-md p-2"
               />
             </div>
@@ -178,7 +222,6 @@ export default function ActivityForm() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Local</label>
               <select
                 {...register('local', { required: true })}
-                disabled={isViewMode}
                 className="w-full border rounded-md p-2 bg-white"
               >
                 <option value="">Selecione...</option>
@@ -192,7 +235,6 @@ export default function ActivityForm() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Duração</label>
               <select
                 {...register('duracao', { required: true })}
-                disabled={isViewMode}
                 className="w-full border rounded-md p-2 bg-white"
               >
                 <option value="">Selecione...</option>
@@ -208,7 +250,6 @@ export default function ActivityForm() {
               <input
                 type="text"
                 {...register('oficina', { required: true })}
-                disabled={isViewMode}
                 className="w-full border rounded-md p-2"
               />
             </div>
@@ -217,7 +258,6 @@ export default function ActivityForm() {
               <input
                 type="text"
                 {...register('atividade_nome', { required: true })}
-                disabled={isViewMode}
                 className="w-full border rounded-md p-2"
               />
             </div>
@@ -225,7 +265,6 @@ export default function ActivityForm() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Recursos Humanos</label>
               <textarea
                 {...register('recursos_humanos', { required: true })}
-                disabled={isViewMode}
                 className="w-full border rounded-md p-2 h-20"
               />
             </div>
@@ -233,7 +272,6 @@ export default function ActivityForm() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Objetivos</label>
               <textarea
                 {...register('objetivos', { required: true })}
-                disabled={isViewMode}
                 className="w-full border rounded-md p-2 h-20"
               />
             </div>
@@ -241,7 +279,6 @@ export default function ActivityForm() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Avaliação Global</label>
               <textarea
                 {...register('avaliacao_global')}
-                disabled={isViewMode}
                 className="w-full border rounded-md p-2 h-20"
               />
             </div>
@@ -249,7 +286,6 @@ export default function ActivityForm() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Dificuldades Sentidas</label>
               <textarea
                 {...register('dificuldades')}
-                disabled={isViewMode}
                 className="w-full border rounded-md p-2 h-20"
               />
             </div>
@@ -257,7 +293,6 @@ export default function ActivityForm() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Outras Informações</label>
               <textarea
                 {...register('outras_informacoes')}
-                disabled={isViewMode}
                 className="w-full border rounded-md p-2 h-20"
               />
             </div>
@@ -268,15 +303,13 @@ export default function ActivityForm() {
           <div>
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold text-gray-800">Utentes e Avaliações</h3>
-              {!isViewMode && (
-                <button
-                  type="button"
-                  onClick={() => append({ utente_id: '', grau_participacao: 'MB', interesse_demonstrado: 'MB', alcance_objetivos: 'MB' })}
-                  className="flex items-center gap-1 text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded hover:bg-gray-200"
-                >
-                  <Plus size={16} /> Adicionar Utente
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => append({ utente_id: '', grau_participacao: 'MB', interesse_demonstrado: 'MB', alcance_objetivos: 'MB' })}
+                className="flex items-center gap-1 text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded hover:bg-gray-200"
+              >
+                <Plus size={16} /> Adicionar Utente
+              </button>
             </div>
 
             <div className="mt-4">
@@ -286,7 +319,7 @@ export default function ActivityForm() {
                 <div className="col-span-2 text-center">Participação</div>
                 <div className="col-span-2 text-center">Interesse</div>
                 <div className="col-span-2 text-center">Objetivos</div>
-                {!isViewMode && <div className="col-span-2 text-center">Ações</div>}
+                <div className="col-span-2 text-center">Ações</div>
               </div>
 
               {/* Rows */}
@@ -296,23 +329,19 @@ export default function ActivityForm() {
                     {/* Utente */}
                     <div className="col-span-1 md:col-span-4 flex flex-row items-center justify-between md:justify-start gap-4">
                       <span className="md:hidden font-medium text-sm text-gray-500 whitespace-nowrap">Utente</span>
-                      {isViewMode ? (
-                        <span className="text-sm font-semibold md:font-normal text-right md:text-left">{field.utentes?.apelido}</span>
-                      ) : (
-                        <select
-                          {...register(`avaliacoes.${index}.utente_id`, { required: true })}
-                          className="w-full md:flex-1 border rounded p-1.5 text-sm bg-white"
-                        >
-                          <option value="">Selecione...</option>
-                          {utentesDb.map(u => {
-                            const isSelectedInOtherRow = avaliacoesWatch?.some(
-                              (av, avIndex) => avIndex !== index && av.utente_id === u.id
-                            );
-                            if (isSelectedInOtherRow) return null;
-                            return <option key={u.id} value={u.id}>{u.apelido}</option>;
-                          })}
-                        </select>
-                      )}
+                      <select
+                        {...register(`avaliacoes.${index}.utente_id`, { required: true })}
+                        className="w-full md:flex-1 border rounded p-1.5 text-sm bg-white"
+                      >
+                        <option value="">Selecione...</option>
+                        {utentesDb.map(u => {
+                          const isSelectedInOtherRow = avaliacoesWatch?.some(
+                            (av, avIndex) => avIndex !== index && av.utente_id === u.id
+                          );
+                          if (isSelectedInOtherRow) return null;
+                          return <option key={u.id} value={u.id}>{u.apelido}</option>;
+                        })}
+                      </select>
                     </div>
 
                     {/* Participação */}
@@ -320,7 +349,6 @@ export default function ActivityForm() {
                       <span className="md:hidden text-sm text-gray-500">Participação</span>
                       <select
                         {...register(`avaliacoes.${index}.grau_participacao`)}
-                        disabled={isViewMode}
                         className="border rounded p-1.5 text-sm w-20 md:w-16 text-center bg-white"
                       >
                         {notas.map(n => <option key={n} value={n}>{n}</option>)}
@@ -332,7 +360,6 @@ export default function ActivityForm() {
                       <span className="md:hidden text-sm text-gray-500">Interesse</span>
                       <select
                         {...register(`avaliacoes.${index}.interesse_demonstrado`)}
-                        disabled={isViewMode}
                         className="border rounded p-1.5 text-sm w-20 md:w-16 text-center bg-white"
                       >
                         {notas.map(n => <option key={n} value={n}>{n}</option>)}
@@ -344,7 +371,6 @@ export default function ActivityForm() {
                       <span className="md:hidden text-sm text-gray-500">Objetivos</span>
                       <select
                         {...register(`avaliacoes.${index}.alcance_objetivos`)}
-                        disabled={isViewMode}
                         className="border rounded p-1.5 text-sm w-20 md:w-16 text-center bg-white"
                       >
                         {notas.map(n => <option key={n} value={n}>{n}</option>)}
@@ -352,17 +378,15 @@ export default function ActivityForm() {
                     </div>
 
                     {/* Remove Action */}
-                    {!isViewMode && (
-                      <div className="col-span-1 md:col-span-2 flex justify-end md:justify-center mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-none border-gray-100">
-                        <button
-                          type="button"
-                          onClick={() => remove(index)}
-                          className="text-red-500 hover:text-red-700 flex items-center gap-1 text-sm bg-red-50 md:bg-transparent px-3 py-1.5 md:p-0 rounded"
-                        >
-                          <Trash2 size={16} /> <span className="md:hidden font-medium">Remover</span>
-                        </button>
-                      </div>
-                    )}
+                    <div className="col-span-1 md:col-span-2 flex justify-end md:justify-center mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-none border-gray-100">
+                      <button
+                        type="button"
+                        onClick={() => remove(index)}
+                        className="text-red-500 hover:text-red-700 flex items-center gap-1 text-sm bg-red-50 md:bg-transparent px-3 py-1.5 md:p-0 rounded"
+                      >
+                        <Trash2 size={16} /> <span className="md:hidden font-medium">Remover</span>
+                      </button>
+                    </div>
                   </div>
                 ))}
 

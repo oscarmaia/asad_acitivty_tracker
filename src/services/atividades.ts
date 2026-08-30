@@ -104,5 +104,70 @@ export const atividadesService = {
     }
 
     return atividadeInserida;
+  },
+
+  async atualizarAtividadeComAvaliacoes(id: string, atividade: AtividadeData, avaliacoes: AvaliacaoData[]) {
+    // 1. Atualizar a Atividade
+    const { error: erroAtividade } = await supabase
+      .from('atividades')
+      .update(atividade)
+      .eq('id', id);
+
+    if (erroAtividade) {
+      console.error('Erro ao atualizar atividade', erroAtividade);
+      throw new Error(erroAtividade.message);
+    }
+
+    // 2. Eliminar avaliações antigas
+    const { error: erroDelete } = await supabase
+      .from('avaliacoes')
+      .delete()
+      .eq('atividade_id', id);
+
+    if (erroDelete) {
+      console.error('Erro ao eliminar avaliações antigas', erroDelete);
+      throw new Error(erroDelete.message);
+    }
+
+    // 3. Inserir novas avaliações
+    if (avaliacoes && avaliacoes.length > 0) {
+      const avaliacoesParaInserir = avaliacoes.map(av => ({
+        ...av,
+        atividade_id: id,
+      }));
+
+      const { error: erroAvaliacoes } = await supabase
+        .from('avaliacoes')
+        .insert(avaliacoesParaInserir);
+
+      if (erroAvaliacoes) {
+        console.error('Erro ao inserir novas avaliações', erroAvaliacoes);
+        throw new Error(erroAvaliacoes.message);
+      }
+    }
+  },
+
+  async deleteAtividade(id: string) {
+    // Avaliações are cascaded via DB foreign keys normally, 
+    // but just in case, we can delete them explicitly or let Supabase do it.
+    const { error: erroAvaliacoes } = await supabase
+      .from('avaliacoes')
+      .delete()
+      .eq('atividade_id', id);
+
+    if (erroAvaliacoes) {
+      console.error('Erro ao eliminar avaliações da atividade', erroAvaliacoes);
+      throw new Error(erroAvaliacoes.message);
+    }
+
+    const { error: erroAtividade } = await supabase
+      .from('atividades')
+      .delete()
+      .eq('id', id);
+
+    if (erroAtividade) {
+      console.error('Erro ao eliminar atividade', erroAtividade);
+      throw new Error(erroAtividade.message);
+    }
   }
 };

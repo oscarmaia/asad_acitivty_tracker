@@ -73,7 +73,10 @@ export default function Dashboard() {
         </div>
 
         {loading ? (
-          <div className="text-center py-10 text-gray-500">Carregando...</div>
+          <div className="flex flex-col items-center justify-center py-20 text-gray-500">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-4"></div>
+            <p className="text-sm font-medium">A carregar atividades...</p>
+          </div>
         ) : (
           <div className="bg-transparent md:bg-white md:rounded-lg md:shadow overflow-hidden">
             <div className="hidden md:grid md:grid-cols-12 gap-4 bg-gray-50 px-6 py-3 border-b text-xs font-medium text-gray-500 uppercase tracking-wider">
