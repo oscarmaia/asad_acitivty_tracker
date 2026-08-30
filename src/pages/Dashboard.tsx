@@ -36,7 +36,13 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold text-gray-800">ASAD - Gestão de Atividades</h1>
+        <div className="flex items-center gap-8">
+          <h1 className="text-xl font-bold text-gray-800">ASAD - Gestão</h1>
+          <div className="flex gap-4">
+            <Link to="/" className="text-blue-600 font-medium">Atividades</Link>
+            <Link to="/utentes" className="text-gray-500 hover:text-blue-600">Utentes</Link>
+          </div>
+        </div>
         <div className="flex items-center gap-4">
           <span className="text-sm text-gray-600">{user?.email}</span>
           <button onClick={signOut} className="text-gray-500 hover:text-red-600" title="Sair">
