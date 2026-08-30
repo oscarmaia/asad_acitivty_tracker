@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { ArrowLeft, Save, Copy, FileText, Plus, Trash2 } from 'lucide-react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { atividadesService } from '../services/atividades';
@@ -43,6 +43,11 @@ export default function ActivityForm() {
   });
 
   const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'avaliacoes',
+  });
+
+  const avaliacoesWatch = useWatch({
     control,
     name: 'avaliacoes',
   });
@@ -274,86 +279,99 @@ export default function ActivityForm() {
               )}
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Utente</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500">Participação</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500">Interesse</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500">Objetivos</th>
-                    {!isViewMode && <th className="px-4 py-3"></th>}
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {fields.map((field, index) => (
-                    <tr key={field.id}>
-                      <td className="px-4 py-3">
-                        {isViewMode ? (
-                          <span className="text-sm">
-                            {field.utentes?.nome} {field.utentes?.apelido}
-                          </span>
-                        ) : (
-                          <select
-                            {...register(`avaliacoes.${index}.utente_id`, { required: true })}
-                            className="w-full border rounded p-1 text-sm"
-                          >
-                            <option value="">Selecione...</option>
-                            {utentesDb.map(u => (
-                              <option key={u.id} value={u.id}>{u.nome} {u.apelido}</option>
-                            ))}
-                          </select>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-center">
+            <div className="mt-4">
+              {/* Desktop Header */}
+              <div className="hidden md:grid md:grid-cols-12 gap-4 bg-gray-50 p-4 rounded-t-md border-b text-xs font-medium text-gray-500">
+                <div className="col-span-4">Utente</div>
+                <div className="col-span-2 text-center">Participação</div>
+                <div className="col-span-2 text-center">Interesse</div>
+                <div className="col-span-2 text-center">Objetivos</div>
+                {!isViewMode && <div className="col-span-2 text-center">Ações</div>}
+              </div>
+
+              {/* Rows */}
+              <div className="space-y-4 md:space-y-0 md:divide-y md:divide-gray-200">
+                {fields.map((field, index) => (
+                  <div key={field.id} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-white border md:border-none md:border-b-0 rounded-lg p-4 shadow-sm md:shadow-none">
+                    {/* Utente */}
+                    <div className="col-span-1 md:col-span-4 flex flex-row items-center justify-between md:justify-start gap-4">
+                      <span className="md:hidden font-medium text-sm text-gray-500 whitespace-nowrap">Utente</span>
+                      {isViewMode ? (
+                        <span className="text-sm font-semibold md:font-normal text-right md:text-left">{field.utentes?.apelido}</span>
+                      ) : (
                         <select
-                          {...register(`avaliacoes.${index}.grau_participacao`)}
-                          disabled={isViewMode}
-                          className="border rounded p-1 text-sm w-16 text-center"
+                          {...register(`avaliacoes.${index}.utente_id`, { required: true })}
+                          className="w-full md:flex-1 border rounded p-1.5 text-sm bg-white"
                         >
-                          {notas.map(n => <option key={n} value={n}>{n}</option>)}
+                          <option value="">Selecione...</option>
+                          {utentesDb.map(u => {
+                            const isSelectedInOtherRow = avaliacoesWatch?.some(
+                              (av, avIndex) => avIndex !== index && av.utente_id === u.id
+                            );
+                            if (isSelectedInOtherRow) return null;
+                            return <option key={u.id} value={u.id}>{u.apelido}</option>;
+                          })}
                         </select>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <select
-                          {...register(`avaliacoes.${index}.interesse_demonstrado`)}
-                          disabled={isViewMode}
-                          className="border rounded p-1 text-sm w-16 text-center"
-                        >
-                          {notas.map(n => <option key={n} value={n}>{n}</option>)}
-                        </select>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <select
-                          {...register(`avaliacoes.${index}.alcance_objetivos`)}
-                          disabled={isViewMode}
-                          className="border rounded p-1 text-sm w-16 text-center"
-                        >
-                          {notas.map(n => <option key={n} value={n}>{n}</option>)}
-                        </select>
-                      </td>
-                      {!isViewMode && (
-                        <td className="px-4 py-3 text-center">
-                          <button
-                            type="button"
-                            onClick={() => remove(index)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </td>
                       )}
-                    </tr>
-                  ))}
-                  {fields.length === 0 && (
-                    <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-gray-500 text-sm">
-                        Nenhum utente adicionado a esta atividade. Se o utente não for adicionado, será considerado ausente.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    </div>
+
+                    {/* Participação */}
+                    <div className="col-span-1 md:col-span-2 flex items-center justify-between md:justify-center">
+                      <span className="md:hidden text-sm text-gray-500">Participação</span>
+                      <select
+                        {...register(`avaliacoes.${index}.grau_participacao`)}
+                        disabled={isViewMode}
+                        className="border rounded p-1.5 text-sm w-20 md:w-16 text-center bg-white"
+                      >
+                        {notas.map(n => <option key={n} value={n}>{n}</option>)}
+                      </select>
+                    </div>
+
+                    {/* Interesse */}
+                    <div className="col-span-1 md:col-span-2 flex items-center justify-between md:justify-center">
+                      <span className="md:hidden text-sm text-gray-500">Interesse</span>
+                      <select
+                        {...register(`avaliacoes.${index}.interesse_demonstrado`)}
+                        disabled={isViewMode}
+                        className="border rounded p-1.5 text-sm w-20 md:w-16 text-center bg-white"
+                      >
+                        {notas.map(n => <option key={n} value={n}>{n}</option>)}
+                      </select>
+                    </div>
+
+                    {/* Objetivos */}
+                    <div className="col-span-1 md:col-span-2 flex items-center justify-between md:justify-center">
+                      <span className="md:hidden text-sm text-gray-500">Objetivos</span>
+                      <select
+                        {...register(`avaliacoes.${index}.alcance_objetivos`)}
+                        disabled={isViewMode}
+                        className="border rounded p-1.5 text-sm w-20 md:w-16 text-center bg-white"
+                      >
+                        {notas.map(n => <option key={n} value={n}>{n}</option>)}
+                      </select>
+                    </div>
+
+                    {/* Remove Action */}
+                    {!isViewMode && (
+                      <div className="col-span-1 md:col-span-2 flex justify-end md:justify-center mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-none border-gray-100">
+                        <button
+                          type="button"
+                          onClick={() => remove(index)}
+                          className="text-red-500 hover:text-red-700 flex items-center gap-1 text-sm bg-red-50 md:bg-transparent px-3 py-1.5 md:p-0 rounded"
+                        >
+                          <Trash2 size={16} /> <span className="md:hidden font-medium">Remover</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {fields.length === 0 && (
+                  <div className="p-8 text-center text-gray-500 text-sm md:border-t border-gray-200 bg-gray-50 rounded-lg md:rounded-none">
+                    Nenhum utente adicionado a esta atividade.
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </form>

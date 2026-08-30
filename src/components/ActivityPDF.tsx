@@ -1,163 +1,132 @@
-import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
+import { Page, Text, View, Document, StyleSheet, Image } from '@react-pdf/renderer';
 import { format } from 'date-fns';
 
-// Registar fonte (opcional, mas recomendado se usar caracteres pt)
-// Font.register({ family: 'Open Sans', src: 'https://fonts.gstatic.com/s/opensans/v18/mem8YaGs126MiZpBA-UFVZ0e.ttf' });
+const BORDER_COLOR = '#000';
+const BG_GREEN = '#c5e0b4';
+const BORDER_WIDTH = 1;
 
 const styles = StyleSheet.create({
   page: {
     padding: 30,
+    paddingTop: 40,
     fontSize: 10,
     fontFamily: 'Helvetica',
   },
-  header: {
+  headerTop: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    borderBottomColor: '#000',
-    paddingBottom: 10,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
     marginBottom: 20,
   },
-  logoPlaceholder: {
-    width: 60,
-    height: 60,
-    backgroundColor: '#eee',
-    justifyContent: 'center',
-    alignItems: 'center',
+  headerText: {
+    fontSize: 10,
+    marginRight: 10,
   },
-  titleArea: {
-    flex: 1,
-    marginLeft: 15,
+  logo: {
+    width: 70,
+    height: 70,
+    objectFit: 'contain',
   },
   title: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
-  },
-  subtitle: {
-    fontSize: 12,
-    color: '#666',
-  },
-  sectionTitle: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    backgroundColor: '#f3f4f6',
-    padding: 4,
-    marginTop: 15,
-    marginBottom: 5,
-  },
-  grid2: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 10,
-  },
-  col: {
-    width: '50%',
-    paddingRight: 10,
-    marginBottom: 5,
-  },
-  label: {
-    fontWeight: 'bold',
-    fontSize: 9,
-    color: '#444',
-  },
-  value: {
-    fontSize: 10,
-    marginBottom: 5,
-  },
-  textBlock: {
-    marginBottom: 10,
+    textAlign: 'center',
+    marginBottom: 15,
   },
   table: {
-    width: 'auto',
+    width: '100%',
+    borderWidth: BORDER_WIDTH,
+    borderColor: BORDER_COLOR,
     borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#bfbfbf',
-    borderRightWidth: 0,
-    borderBottomWidth: 0,
-    marginTop: 10,
   },
-  tableRow: {
-    margin: 'auto',
+  row: {
     flexDirection: 'row',
+    borderBottomWidth: BORDER_WIDTH,
+    borderColor: BORDER_COLOR,
+    minHeight: 25,
   },
-  tableColHeader: {
-    width: '16.6%',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#bfbfbf',
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-    backgroundColor: '#f3f4f6',
-    padding: 4,
+  lastRow: {
+    flexDirection: 'row',
+    minHeight: 25,
   },
-  tableColHeaderName: {
-    width: '25%',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#bfbfbf',
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-    backgroundColor: '#f3f4f6',
+  // Section 1 columns
+  colLabel: {
+    backgroundColor: BG_GREEN,
     padding: 4,
+    fontWeight: 'bold',
+    borderRightWidth: BORDER_WIDTH,
+    borderColor: BORDER_COLOR,
+    justifyContent: 'center',
   },
-  tableColHeaderPres: {
-    width: '9%',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#bfbfbf',
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-    backgroundColor: '#f3f4f6',
+  colValue: {
     padding: 4,
+    borderRightWidth: BORDER_WIDTH,
+    borderColor: BORDER_COLOR,
+    justifyContent: 'center',
+  },
+  colValueLast: {
+    padding: 4,
+    justifyContent: 'center',
+  },
+  
+  // Utentes Headers
+  utentesHeaderLabel: {
+    backgroundColor: BG_GREEN,
+    padding: 4,
+    fontWeight: 'bold',
+    borderRightWidth: BORDER_WIDTH,
+    borderColor: BORDER_COLOR,
+    justifyContent: 'center',
+    alignItems: 'center',
     textAlign: 'center',
   },
-  tableColName: {
-    width: '25%',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#bfbfbf',
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
+  utentesHeaderLabelLast: {
+    backgroundColor: BG_GREEN,
     padding: 4,
-  },
-  tableColPres: {
-    width: '9%',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#bfbfbf',
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-    padding: 4,
+    fontWeight: 'bold',
+    justifyContent: 'center',
+    alignItems: 'center',
     textAlign: 'center',
   },
-  tableCol: {
-    width: '16.6%',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#bfbfbf',
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
+
+  // Utentes Row Cells
+  utentesCell: {
     padding: 4,
+    borderRightWidth: BORDER_WIDTH,
+    borderColor: BORDER_COLOR,
+    justifyContent: 'center',
+    alignItems: 'center',
     textAlign: 'center',
   },
-  tableCellHeader: {
+  utentesCellLeft: {
+    padding: 4,
+    borderRightWidth: BORDER_WIDTH,
+    borderColor: BORDER_COLOR,
+    justifyContent: 'center',
+  },
+  utentesCellLast: {
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+  },
+
+  // Legend and Footer
+  legend: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 5,
     fontSize: 8,
     fontWeight: 'bold',
   },
-  tableCell: {
-    fontSize: 8,
-  },
-  footer: {
+  footerText: {
     position: 'absolute',
-    bottom: 30,
+    bottom: 20,
     left: 30,
     right: 30,
     textAlign: 'center',
-    color: '#888',
-    fontSize: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-    paddingTop: 10,
+    fontSize: 7,
+    color: '#000',
   }
 });
 
@@ -166,116 +135,161 @@ interface ActivityPDFProps {
   avaliacoes: any[];
 }
 
-export const ActivityPDF = ({ atividade, avaliacoes }: ActivityPDFProps) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      
-      {/* Cabeçalho */}
-      <View style={styles.header}>
-        <View style={styles.logoPlaceholder}>
-          <Text style={{ fontSize: 8 }}>LOGO ASAD</Text>
-        </View>
-        <View style={styles.titleArea}>
-          <Text style={styles.title}>Associação de Apoio Social (ASAD)</Text>
-          <Text style={styles.subtitle}>Relatório de Registo de Atividade</Text>
-        </View>
-      </View>
-
-      {/* Dados da Atividade */}
-      <Text style={styles.sectionTitle}>Identificação da Atividade</Text>
-      
-      <View style={styles.grid2}>
-        <View style={styles.col}>
-          <Text style={styles.label}>Data</Text>
-          <Text style={styles.value}>{atividade.data ? format(new Date(atividade.data), 'dd/MM/yyyy') : ''}</Text>
-        </View>
-        <View style={styles.col}>
-          <Text style={styles.label}>Local</Text>
-          <Text style={styles.value}>{atividade.local}</Text>
-        </View>
-        <View style={styles.col}>
-          <Text style={styles.label}>Duração</Text>
-          <Text style={styles.value}>{atividade.duracao}</Text>
-        </View>
-        <View style={styles.col}>
-          <Text style={styles.label}>Oficina</Text>
-          <Text style={styles.value}>{atividade.oficina}</Text>
-        </View>
-        <View style={styles.col}>
-          <Text style={styles.label}>Nome da Atividade</Text>
-          <Text style={styles.value}>{atividade.atividade_nome}</Text>
-        </View>
-        <View style={styles.col}>
-          <Text style={styles.label}>Recursos Humanos</Text>
-          <Text style={styles.value}>{atividade.recursos_humanos}</Text>
-        </View>
-      </View>
-
-      <View style={styles.textBlock}>
-        <Text style={styles.label}>Objetivos</Text>
-        <Text style={styles.value}>{atividade.objetivos}</Text>
-      </View>
-
-      <View style={styles.textBlock}>
-        <Text style={styles.label}>Avaliação Global</Text>
-        <Text style={styles.value}>{atividade.avaliacao_global || 'N/A'}</Text>
-      </View>
-
-      <View style={styles.textBlock}>
-        <Text style={styles.label}>Dificuldades Sentidas</Text>
-        <Text style={styles.value}>{atividade.dificuldades || 'N/A'}</Text>
-      </View>
-
-      <View style={styles.textBlock}>
-        <Text style={styles.label}>Outras Informações</Text>
-        <Text style={styles.value}>{atividade.outras_informacoes || 'N/A'}</Text>
-      </View>
-
-      {/* Tabela de Utentes e Avaliações */}
-      <Text style={styles.sectionTitle}>Utentes e Avaliação</Text>
-      <View style={styles.table}>
-        <View style={styles.tableRow}>
-          <View style={styles.tableColHeaderName}>
-            <Text style={styles.tableCellHeader}>Nome</Text>
-          </View>
-          <View style={styles.tableColHeaderPres}>
-            <Text style={styles.tableCellHeader}>Pres.</Text>
-          </View>
-          <View style={styles.tableColHeader}>
-            <Text style={styles.tableCellHeader}>Participação</Text>
-          </View>
-          <View style={styles.tableColHeader}>
-            <Text style={styles.tableCellHeader}>Interesse</Text>
-          </View>
-          <View style={styles.tableColHeader}>
-            <Text style={styles.tableCellHeader}>Objetivos</Text>
-          </View>
+export const ActivityPDF = ({ atividade, avaliacoes }: ActivityPDFProps) => {
+  return (
+    <Document>
+      <Page size="A4" orientation="landscape" style={styles.page}>
+        <View style={styles.headerTop}>
+          <Text style={styles.headerText}>Associação Social de Apoio à Deficiência</Text>
+          <Image src="/asad.jpg" style={styles.logo} />
         </View>
 
-        {avaliacoes.map((av, i) => (
-          <View style={styles.tableRow} key={i}>
-            <View style={styles.tableColName}>
-              <Text style={styles.tableCell}>{av.utentes?.nome} {av.utentes?.apelido}</Text>
+        <Text style={styles.title}>REGISTO DE ATIVIDADES (OFICINAS)</Text>
+
+        <View style={styles.table}>
+          
+          {/* Row 1: Data, Local, Duração */}
+          <View style={styles.row}>
+            <View style={[styles.colLabel, { width: '10%' }]}>
+              <Text>Data:</Text>
             </View>
-            <View style={styles.tableColPres}>
-              <Text style={styles.tableCell}>X</Text>
+            <View style={[styles.colValue, { width: '23.3%' }]}>
+              <Text>{atividade.data ? format(new Date(atividade.data), 'dd/MM/yyyy') : ''}</Text>
             </View>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{av.grau_participacao}</Text>
+            <View style={[styles.colLabel, { width: '10%' }]}>
+              <Text>Local:</Text>
             </View>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{av.interesse_demonstrado}</Text>
+            <View style={[styles.colValue, { width: '23.3%' }]}>
+              <Text>{atividade.local}</Text>
             </View>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{av.alcance_objetivos}</Text>
+            <View style={[styles.colLabel, { width: '15%' }]}>
+              <Text>Duração da atividade:</Text>
+            </View>
+            <View style={[styles.colValueLast, { width: '18.4%' }]}>
+              <Text>{atividade.duracao}</Text>
             </View>
           </View>
-        ))}
-      </View>
 
-      <Text style={styles.footer}>
-        ASAD - Associação de Apoio Social | NIPC: 500000000 | Morada: Rua Exemplo, 123, 1000-000 Lisboa | Contacto: 210000000
-      </Text>
-    </Page>
-  </Document>
-);
+          {/* Row 2: Oficina, Atividade, Recursos */}
+          <View style={styles.row}>
+            <View style={[styles.colLabel, { width: '10%' }]}>
+              <Text>Oficina:</Text>
+            </View>
+            <View style={[styles.colValue, { width: '23.3%' }]}>
+              <Text>{atividade.oficina}</Text>
+            </View>
+            <View style={[styles.colLabel, { width: '10%' }]}>
+              <Text>Atividade:</Text>
+            </View>
+            <View style={[styles.colValue, { width: '23.3%' }]}>
+              <Text>{atividade.atividade_nome}</Text>
+            </View>
+            <View style={[styles.colLabel, { width: '15%' }]}>
+              <Text>Recursos humanos:</Text>
+            </View>
+            <View style={[styles.colValueLast, { width: '18.4%' }]}>
+              <Text>{atividade.recursos_humanos}</Text>
+            </View>
+          </View>
+
+          {/* Row 3: Objetivos */}
+          <View style={styles.row}>
+            <View style={[styles.colLabel, { width: '10%' }]}>
+              <Text>Objetivos:</Text>
+            </View>
+            <View style={[styles.colValueLast, { width: '90%' }]}>
+              <Text>{atividade.objetivos}</Text>
+            </View>
+          </View>
+
+          {/* Row 4: Utentes Headers */}
+          <View style={styles.row}>
+            <View style={[styles.utentesHeaderLabel, { width: '25%' }]}>
+              <Text>Utentes:</Text>
+            </View>
+            <View style={[styles.utentesHeaderLabel, { width: '15%' }]}>
+              <Text>Participantes:{'\n'}(Marcar com X)</Text>
+            </View>
+            <View style={[styles.utentesHeaderLabel, { width: '20%' }]}>
+              <Text>Grau de participação{'\n'}(MB/B/S/PS/I)</Text>
+            </View>
+            <View style={[styles.utentesHeaderLabel, { width: '20%' }]}>
+              <Text>Interesse demonstrado{'\n'}(MB/B/S/PS/I)</Text>
+            </View>
+            <View style={[styles.utentesHeaderLabelLast, { width: '20%' }]}>
+              <Text>Alcance dos objetivos{'\n'}propostos* (MB/B/S/PS/I)</Text>
+            </View>
+          </View>
+
+          {/* Utentes Data Rows */}
+          {avaliacoes.map((av, index) => (
+            <View style={styles.row} key={index}>
+              <View style={[styles.utentesCellLeft, { width: '25%' }]}>
+                <Text>{av.utentes?.apelido}</Text>
+              </View>
+              <View style={[styles.utentesCell, { width: '15%' }]}>
+                <Text>X</Text>
+              </View>
+              <View style={[styles.utentesCell, { width: '20%' }]}>
+                <Text>{av.grau_participacao || ''}</Text>
+              </View>
+              <View style={[styles.utentesCell, { width: '20%' }]}>
+                <Text>{av.interesse_demonstrado || ''}</Text>
+              </View>
+              <View style={[styles.utentesCellLast, { width: '20%' }]}>
+                <Text>{av.alcance_objetivos || ''}</Text>
+              </View>
+            </View>
+          ))}
+
+          {/* Avaliação Global */}
+          <View style={styles.row}>
+            <View style={[styles.colLabel, { width: '25%' }]}>
+              <Text>Avaliação Global{'\n'}da atividade</Text>
+            </View>
+            <View style={[styles.colValueLast, { width: '75%' }]}>
+              <Text>{atividade.avaliacao_global || ''}</Text>
+            </View>
+          </View>
+
+          {/* Dificuldades */}
+          <View style={styles.row}>
+            <View style={[styles.colLabel, { width: '25%' }]}>
+              <Text>Dificuldades{'\n'}sentidas</Text>
+            </View>
+            <View style={[styles.colValueLast, { width: '75%' }]}>
+              <Text>{atividade.dificuldades || ''}</Text>
+            </View>
+          </View>
+
+          {/* Outras informações */}
+          <View style={styles.lastRow}>
+            <View style={[styles.colLabel, { width: '25%', borderBottomWidth: 0 }]}>
+              <Text>Outras{'\n'}informações</Text>
+            </View>
+            <View style={[styles.colValueLast, { width: '75%' }]}>
+              <Text>{atividade.outras_informacoes || ''}</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Legenda */}
+        <View style={styles.legend}>
+          <Text>Legenda: MB – Muito bom</Text>
+          <Text>B – Bom</Text>
+          <Text>S – Satisfatório</Text>
+          <Text>PS – Pouco Satisfatório</Text>
+          <Text>I – Insatisfatório</Text>
+        </View>
+
+        {/* Footer */}
+        <Text style={styles.footerText}>
+          ASAD - Associação Social de Apoio à Deficiência{'\n'}
+          Rua de São Jorge, nº881, 4880-281 Paradança, Mondim de Basto{'\n'}
+          Telemóvel: 937 243 017 / Telefone: 255 382 271 / E-mail: geral@asad.pt{'\n'}
+          NIPC: 513 745 327
+        </Text>
+      </Page>
+    </Document>
+  );
+};
