@@ -1,0 +1,108 @@
+import { supabase } from '../lib/supabase/client';
+
+export type AtividadeData = {
+  data: string;
+  local: string;
+  duracao: string;
+  oficina: string;
+  atividade_nome: string;
+  recursos_humanos: string;
+  objetivos: string;
+  avaliacao_global?: string;
+  dificuldades?: string;
+  outras_informacoes?: string;
+};
+
+export type AvaliacaoData = {
+  utente_id: string;
+  grau_participacao: 'MB' | 'B' | 'S' | 'PS' | 'I';
+  interesse_demonstrado: 'MB' | 'B' | 'S' | 'PS' | 'I';
+  alcance_objetivos: 'MB' | 'B' | 'S' | 'PS' | 'I';
+};
+
+export const atividadesService = {
+  async getAtividades() {
+    const { data, error } = await supabase
+      .from('atividades')
+      .select('*')
+      .order('data', { ascending: false });
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async getUtentes() {
+    const { data, error } = await supabase
+      .from('utentes')
+      .select('*')
+      .eq('ativo', true)
+      .order('nome', { ascending: true });
+      
+    if (error) throw error;
+    return data;
+  },
+
+  async getAtividade(id: string) {
+    const { data: atividade, error: atividadeError } = await supabase
+      .from('atividades')
+      .select('*')
+      .eq('id', id)
+      .single();
+      
+    if (atividadeError) throw atividadeError;
+
+    const { data: avaliacoes, error: avaliacoesError } = await supabase
+      .from('avaliacoes')
+      .select(`
+        *,
+        utentes (
+          nome,
+          apelido
+        )
+      `)
+      .eq('atividade_id', id);
+      
+    if (avaliacoesError) throw avaliacoesError;
+
+    return { atividade, avaliacoes };
+  },
+
+  /**
+   * Insere uma Atividade e as suas Avaliações numa única transação "simulada" 
+   * ou duas queries seguidas (como é cliente frontend, fazemos em 2 passos seguidos).
+   */
+  async criarAtividadeComAvaliacoes(atividade: AtividadeData, avaliacoes: AvaliacaoData[]) {
+    // 1. Inserir a Atividade e obter o ID retornado
+    const { data: atividadeInserida, error: erroAtividade } = await supabase
+      .from('atividades')
+      .insert([atividade])
+      .select()
+      .single();
+
+    if (erroAtividade) {
+      console.error('Erro ao inserir atividade', erroAtividade);
+      throw new Error(erroAtividade.message);
+    }
+
+    // 2. Se houver avaliações, associar o atividade_id e inserir em bulk
+    if (avaliacoes && avaliacoes.length > 0) {
+      const avaliacoesParaInserir = avaliacoes.map(av => ({
+        ...av,
+        atividade_id: atividadeInserida.id,
+      }));
+
+      const { error: erroAvaliacoes } = await supabase
+        .from('avaliacoes')
+        .insert(avaliacoesParaInserir);
+
+      if (erroAvaliacoes) {
+        console.error('Erro ao inserir avaliações', erroAvaliacoes);
+        // Em caso de falha severa na junção, podemos querer fazer "rollback" apagando a atividade
+        await supabase.from('atividades').delete().eq('id', atividadeInserida.id);
+        throw new Error(erroAvaliacoes.message);
+      }
+    }
+
+    return atividadeInserida;
+  }
+};
