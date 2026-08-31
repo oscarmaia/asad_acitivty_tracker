@@ -108,7 +108,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm px-4 md:px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
         <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 w-full md:w-auto">
-          <h1 className="text-xl font-bold text-gray-800 w-full text-center md:text-left md:w-auto">ASAD - Gestão</h1>
+          <h1 className="text-xl font-bold text-gray-800 w-full text-center md:text-left md:w-auto">ASAD - Registo Atividades</h1>
           <div className="flex gap-4 w-full justify-center md:w-auto md:justify-start border-b pb-2 md:border-b-0 md:pb-0 border-gray-100">
             <Link to="/" className="text-blue-600 font-medium">Atividades</Link>
             <Link to="/utentes" className="text-gray-500 hover:text-blue-600">Utentes</Link>
