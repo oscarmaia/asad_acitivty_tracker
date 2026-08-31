@@ -162,7 +162,7 @@ export const atividadesService = {
     if (avaliacoes && avaliacoes.length > 0) {
       const avaliacoesParaInserir = avaliacoes.map(av => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
-        const { utentes, id, created_at, atividade_id, ...resto } = av as any;
+        const { utentes, id: _avId, created_at, atividade_id, ...resto } = av as any;
         return {
           ...resto,
           atividade_id: id,
