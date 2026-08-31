@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { atividadesService } from '../services/atividades';
 import { Link, useNavigate } from 'react-router-dom';
-import { LogOut, PlusCircle, Search, Edit2, Copy, Trash2 } from 'lucide-react';
+import { LogOut, PlusCircle, Search, Edit2, Copy, Trash2, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import { pdf } from '@react-pdf/renderer';
+import { ActivityPDF } from '../components/ActivityPDF';
+import { getPdfFilename } from '../utils/pdfHelper';
 
 export default function Dashboard() {
   const { signOut, user } = useAuth();
@@ -29,10 +32,7 @@ export default function Dashboard() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    const confirmDelete = window.confirm('Tem a certeza que deseja excluir esta atividade? Esta ação não pode ser desfeita.');
-    if (!confirmDelete) return;
-
+  const executeDelete = async (id: string) => {
     try {
       setLoading(true);
       await atividadesService.deleteAtividade(id);
@@ -45,8 +45,56 @@ export default function Dashboard() {
     }
   };
 
+  const handleDelete = (id: string) => {
+    toast(
+      (t) => (
+        <div>
+          <p className="mb-3 font-medium text-gray-800">Tem a certeza que deseja excluir esta atividade?</p>
+          <div className="flex justify-end gap-2">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-gray-200 font-medium transition"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={() => {
+                toast.dismiss(t.id);
+                executeDelete(id);
+              }}
+              className="px-3 py-1.5 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 font-medium transition"
+            >
+              Excluir
+            </button>
+          </div>
+        </div>
+      ),
+      { duration: 10000 }
+    );
+  };
+
   const handleDuplicate = (id: string) => {
     navigate('/atividade/nova', { state: { cloneFrom: id } });
+  };
+
+  const handleDownloadPDF = async (id: string) => {
+    const loadingToast = toast.loading('A gerar PDF...');
+    try {
+      const { atividade, avaliacoes } = await atividadesService.getAtividade(id);
+      const blob = await pdf(<ActivityPDF atividade={atividade} avaliacoes={avaliacoes} />).toBlob();
+      
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = getPdfFilename(atividade);
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      toast.success('PDF gerado com sucesso!', { id: loadingToast });
+    } catch (err) {
+      console.error(err);
+      toast.error('Erro ao gerar PDF.', { id: loadingToast });
+    }
   };
 
   const filteredAtividades = atividades.filter(
@@ -104,10 +152,10 @@ export default function Dashboard() {
           <div className="bg-transparent md:bg-white md:rounded-lg md:shadow overflow-hidden">
             <div className="hidden md:grid md:grid-cols-12 gap-4 bg-gray-50 px-6 py-3 border-b text-xs font-medium text-gray-500 uppercase tracking-wider">
               <div className="col-span-2">Data</div>
-              <div className="col-span-4">Nome da Atividade</div>
+              <div className="col-span-3">Nome da Atividade</div>
               <div className="col-span-3">Oficina</div>
               <div className="col-span-2">Local</div>
-              <div className="col-span-1 text-right">Ações</div>
+              <div className="col-span-2 text-right">Ações</div>
             </div>
 
             <div className="space-y-4 md:space-y-0 md:divide-y md:divide-gray-200">
@@ -120,7 +168,7 @@ export default function Dashboard() {
                   </div>
                   
                   {/* Nome da Atividade */}
-                  <div className="col-span-1 md:col-span-4 flex justify-between md:block items-center border-b border-gray-100 md:border-none py-2 md:py-0">
+                  <div className="col-span-1 md:col-span-3 flex justify-between md:block items-center border-b border-gray-100 md:border-none py-2 md:py-0">
                     <span className="text-xs font-medium text-gray-500 md:hidden uppercase">Nome da Atividade</span>
                     <span className="text-sm font-bold md:font-medium text-gray-900 text-right md:text-left line-clamp-2 md:line-clamp-none">{atividade.atividade_nome}</span>
                   </div>
@@ -138,7 +186,14 @@ export default function Dashboard() {
                   </div>
 
                   {/* Ações */}
-                  <div className="col-span-1 md:col-span-1 flex justify-end md:justify-end items-center gap-2 pt-2 md:pt-0">
+                  <div className="col-span-1 md:col-span-2 flex justify-end md:justify-end items-center gap-2 pt-2 md:pt-0">
+                    <button 
+                      onClick={() => handleDownloadPDF(atividade.id)}
+                      className="p-1.5 md:p-2 text-green-600 hover:bg-green-50 rounded-md transition" 
+                      title="Gerar PDF"
+                    >
+                      <FileText size={18} />
+                    </button>
                     <button 
                       onClick={() => handleDuplicate(atividade.id)}
                       className="p-1.5 md:p-2 text-indigo-600 hover:bg-indigo-50 rounded-md transition" 

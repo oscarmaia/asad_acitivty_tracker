@@ -8,6 +8,7 @@ import { atividadesService } from '../services/atividades';
 import type { AtividadeData } from '../services/atividades';
 import { ActivityPDF } from '../components/ActivityPDF';
 import { format } from 'date-fns';
+import { getPdfFilename } from '../utils/pdfHelper';
 
 type AvaliacaoForm = {
   utente_id: string;
@@ -145,11 +146,8 @@ export default function ActivityForm() {
 
   const notas = ['MB', 'B', 'S', 'PS', 'I'];
 
-  const handleDelete = async () => {
+  const executeDelete = async () => {
     if (!id) return;
-    const confirmDelete = window.confirm('Tem a certeza que deseja excluir esta atividade? Esta ação não pode ser desfeita.');
-    if (!confirmDelete) return;
-
     setLoading(true);
     try {
       await atividadesService.deleteAtividade(id);
@@ -160,6 +158,34 @@ export default function ActivityForm() {
       toast.error('Erro ao excluir atividade.');
       setLoading(false);
     }
+  };
+
+  const handleDelete = () => {
+    toast(
+      (t) => (
+        <div>
+          <p className="mb-3 font-medium text-gray-800">Tem a certeza que deseja excluir esta atividade?</p>
+          <div className="flex justify-end gap-2">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-gray-200 font-medium transition"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={() => {
+                toast.dismiss(t.id);
+                executeDelete();
+              }}
+              className="px-3 py-1.5 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 font-medium transition"
+            >
+              Excluir
+            </button>
+          </div>
+        </div>
+      ),
+      { duration: 10000 }
+    );
   };
 
   if (pageLoading) {
@@ -198,7 +224,7 @@ export default function ActivityForm() {
           {isViewMode && atividadeCarregada && (
             <PDFDownloadLink
               document={<ActivityPDF atividade={atividadeCarregada.atividade} avaliacoes={atividadeCarregada.avaliacoes} />}
-              fileName={`atividade_${atividadeCarregada.atividade.data}.pdf`}
+              fileName={getPdfFilename(atividadeCarregada.atividade)}
               className="flex justify-center items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg md:rounded hover:bg-green-700 transition flex-1 md:flex-none whitespace-nowrap"
             >
               {({ loading }) => (
@@ -252,10 +278,11 @@ export default function ActivityForm() {
                 className="w-full border rounded-md p-2 bg-white"
               >
                 <option value="">Selecione...</option>
-                <option value="Sede ASAD">Sede ASAD</option>
+                <option value="Sala II">Sala II</option>
+                <option value="Sala III">Sala III</option>
+                <option value="Sala de AVD">Sala de AVD</option>
+                <option value="Espaço Externo">Espaço Externo</option>
                 <option value="Exterior">Exterior</option>
-                <option value="Online">Online</option>
-                <option value="Outro">Outro</option>
               </select>
             </div>
             <div>
@@ -265,11 +292,9 @@ export default function ActivityForm() {
                 className="w-full border rounded-md p-2 bg-white"
               >
                 <option value="">Selecione...</option>
-                <option value="1h">1 hora</option>
-                <option value="2h">2 horas</option>
-                <option value="3h">3 horas</option>
-                <option value="Meio dia">Meio dia</option>
-                <option value="Dia inteiro">Dia inteiro</option>
+                <option value="09:20 às 10:15">Manhã - 1º Bloco (09:20h às 10:15h)</option>
+                <option value="10:40 às 12:00">Manhã - 2º Bloco (10:40h às 12:00h)</option>
+                <option value="14:20 às 16:00">Tarde - 3º Bloco (14:20h às 16:00h)</option>
               </select>
             </div>
             <div>
