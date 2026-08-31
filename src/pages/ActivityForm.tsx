@@ -133,6 +133,16 @@ export default function ActivityForm() {
     }
   };
 
+  const handleAddUtente = () => {
+    append({ utente_id: '', grau_participacao: 'MB', interesse_demonstrado: 'MB', alcance_objetivos: 'MB' });
+    setTimeout(() => {
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth'
+      });
+    }, 100);
+  };
+
   const duplicarAtividade = () => {
     const dados = getValues();
     // Limpar data e avaliações, manter textos base
@@ -357,8 +367,10 @@ export default function ActivityForm() {
               <h3 className="text-lg font-bold text-gray-800">Utentes e Avaliações</h3>
               <button
                 type="button"
-                onClick={() => append({ utente_id: '', grau_participacao: 'MB', interesse_demonstrado: 'MB', alcance_objetivos: 'MB' })}
-                className="flex items-center gap-1 text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded hover:bg-gray-200"
+                disabled={fields.length >= utentesDb.length}
+                onClick={handleAddUtente}
+                className="hidden md:flex items-center gap-1 text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                title={fields.length >= utentesDb.length ? "Todos os utentes ativos já foram adicionados" : "Adicionar utente"}
               >
                 <Plus size={16} /> Adicionar Utente
               </button>
@@ -454,6 +466,24 @@ export default function ActivityForm() {
                   </div>
                 )}
               </div>
+
+              {/* Add row button at the bottom */}
+              {fields.length < utentesDb.length && (
+                <div className="mt-4 flex justify-center md:hidden">
+                  <button
+                    type="button"
+                    onClick={handleAddUtente}
+                    className="flex items-center justify-center gap-2 text-sm bg-blue-50 text-blue-700 font-medium px-4 py-3 w-full rounded-lg hover:bg-blue-100 transition"
+                  >
+                    <Plus size={18} /> Adicionar Utente
+                  </button>
+                </div>
+              )}
+              {fields.length >= utentesDb.length && fields.length > 0 && (
+                <div className="mt-4 text-center text-xs text-gray-400 bg-gray-50 p-2 rounded md:bg-transparent md:p-0 md:mt-2">
+                  Todos os utentes ativos já foram adicionados.
+                </div>
+              )}
             </div>
           </div>
         </form>
