@@ -3,11 +3,11 @@ import { useAuth } from '../contexts/AuthContext';
 import { utentesService } from '../services/utentes';
 import type { UtenteData } from '../services/utentes';
 import { Link } from 'react-router-dom';
-import { Edit2, PlusCircle, Check, X, Save, ArrowLeft, LogOut, Search } from 'lucide-react';
+import { Edit2, PlusCircle, Check, X, Save, LogOut, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function Utentes() {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const [utentes, setUtentes] = useState<UtenteData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -16,10 +16,6 @@ export default function Utentes() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<UtenteData>({ nome: '', apelido: '', ativo: true });
   const [isAdding, setIsAdding] = useState(false);
-
-  useEffect(() => {
-    loadUtentes();
-  }, []);
 
   const loadUtentes = async () => {
     try {
@@ -32,6 +28,11 @@ export default function Utentes() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadUtentes();
+  }, []);
 
   const handleEdit = (u: UtenteData) => {
     setIsAdding(false);
@@ -67,9 +68,15 @@ export default function Utentes() {
     }
   };
 
+  const filteredUtentes = utentes.filter(
+    (u) =>
+      u.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.apelido.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm px-4 md:px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
+      <nav className="bg-white shadow-sm px-4 md:px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
         <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 w-full md:w-auto">
           <h1 className="text-xl font-bold text-gray-800 w-full text-center md:text-left md:w-auto">ASAD - Registo Atividades</h1>
           <div className="flex gap-4 w-full justify-center md:w-auto md:justify-start border-b pb-2 md:border-b-0 md:pb-0 border-gray-100">
@@ -77,16 +84,34 @@ export default function Utentes() {
             <Link to="/utentes" className="text-blue-600 font-medium">Utentes</Link>
           </div>
         </div>
-        <button
-          onClick={handleAdd}
-          className="flex justify-center items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full md:w-auto"
-        >
-          <PlusCircle size={20} />
-          Novo Utente
-        </button>
+        <div className="flex items-center gap-4 w-full justify-between md:w-auto md:justify-end">
+          <span className="text-sm text-gray-600 truncate max-w-[200px] md:max-w-none">{user?.email}</span>
+          <button onClick={signOut} className="text-gray-500 hover:text-red-600 flex items-center gap-1" title="Sair">
+            <LogOut size={20} /> <span className="text-sm md:hidden">Sair</span>
+          </button>
+        </div>
       </nav>
 
-      <main className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8">
+      <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
+        <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 mb-6 md:mb-8">
+          <div className="relative w-full md:w-80">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              type="text"
+              placeholder="Pesquisar..."
+              className="pl-10 pr-4 py-2 border rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <button
+            onClick={handleAdd}
+            className="flex justify-center items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition whitespace-nowrap"
+          >
+            <PlusCircle size={20} />
+            Novo Utente
+          </button>
+        </div>
         
         {(isAdding || editingId) && (
           <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-blue-100 mb-8">
@@ -154,7 +179,7 @@ export default function Utentes() {
             </div>
 
             <div className="space-y-4 md:space-y-0 md:divide-y md:divide-gray-200">
-              {utentes.map((utente) => (
+              {filteredUtentes.map((utente) => (
                 <div key={utente.id} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-white rounded-lg md:rounded-none shadow-sm md:shadow-none p-4 md:px-6 md:py-4 hover:bg-gray-50 transition border border-gray-200 md:border-none">
                   {/* Nome */}
                   <div className="col-span-1 md:col-span-4 flex justify-between md:block items-start md:items-center gap-4 border-b border-gray-100 md:border-none pb-2 md:pb-0">
@@ -195,7 +220,7 @@ export default function Utentes() {
                   </div>
                 </div>
               ))}
-              {utentes.length === 0 && (
+              {filteredUtentes.length === 0 && (
                 <div className="px-6 py-10 text-center text-gray-500 bg-white rounded-lg shadow-sm border border-gray-200">
                   Nenhum utente registado.
                 </div>

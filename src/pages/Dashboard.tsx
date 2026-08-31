@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { atividadesService } from '../services/atividades';
 import { Link, useNavigate } from 'react-router-dom';
-import { LogOut, PlusCircle, Search, Edit2, Copy, Trash2, FileText } from 'lucide-react';
+import { LogOut, PlusCircle, Search, Copy, Trash2, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import { pdf } from '@react-pdf/renderer';
@@ -16,10 +16,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    loadAtividades();
-  }, []);
-
   const loadAtividades = async () => {
     try {
       const data = await atividadesService.getAtividades();
@@ -31,6 +27,11 @@ export default function Dashboard() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadAtividades();
+  }, []);
 
   const executeDelete = async (id: string) => {
     try {
