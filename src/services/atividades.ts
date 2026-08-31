@@ -109,10 +109,13 @@ export const atividadesService = {
 
     // 2. Se houver avaliações, associar o atividade_id e inserir em bulk
     if (avaliacoes && avaliacoes.length > 0) {
-      const avaliacoesParaInserir = avaliacoes.map(av => ({
-        ...av,
-        atividade_id: atividadeInserida.id,
-      }));
+      const avaliacoesParaInserir = avaliacoes.map(av => {
+        const { utentes, id, created_at, atividade_id, ...resto } = av as any;
+        return {
+          ...resto,
+          atividade_id: atividadeInserida.id,
+        };
+      });
 
       const { error: erroAvaliacoes } = await supabase
         .from('avaliacoes')
@@ -156,10 +159,13 @@ export const atividadesService = {
 
     // 3. Inserir novas avaliações
     if (avaliacoes && avaliacoes.length > 0) {
-      const avaliacoesParaInserir = avaliacoes.map(av => ({
-        ...av,
-        atividade_id: id,
-      }));
+      const avaliacoesParaInserir = avaliacoes.map(av => {
+        const { utentes, id: avId, created_at, atividade_id, ...resto } = av as any;
+        return {
+          ...resto,
+          atividade_id: id,
+        };
+      });
 
       const { error: erroAvaliacoes } = await supabase
         .from('avaliacoes')

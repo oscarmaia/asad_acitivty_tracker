@@ -160,57 +160,54 @@ export default function Dashboard() {
 
             <div className="space-y-4 md:space-y-0 md:divide-y md:divide-gray-200">
               {filteredAtividades.map((atividade) => (
-                <div key={atividade.id} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-white rounded-lg md:rounded-none shadow-sm md:shadow-none p-4 md:px-6 md:py-4 hover:bg-gray-50 transition border border-gray-200 md:border-none">
+                <div 
+                  key={atividade.id} 
+                  onClick={() => navigate(`/atividade/${atividade.id}`)}
+                  className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-white rounded-lg md:rounded-none shadow-sm md:shadow-none p-4 md:px-6 md:py-4 hover:bg-blue-50 cursor-pointer transition border border-gray-200 md:border-none"
+                >
                   {/* Data */}
-                  <div className="col-span-1 md:col-span-2 flex justify-between md:block items-center border-b border-gray-100 md:border-none pb-2 md:pb-0">
-                    <span className="text-xs font-medium text-gray-500 md:hidden uppercase">Data</span>
-                    <span className="text-sm text-gray-900">{format(new Date(atividade.data), 'dd/MM/yyyy')}</span>
+                  <div className="col-span-1 md:col-span-2 flex justify-between md:block items-start md:items-center gap-4 border-b border-gray-100 md:border-none pb-2 md:pb-0">
+                    <span className="text-xs font-medium text-gray-500 md:hidden uppercase mt-0.5">Data</span>
+                    <span className="text-sm text-gray-900 text-right md:text-left">{format(new Date(atividade.data), 'dd/MM/yyyy')}</span>
                   </div>
                   
                   {/* Nome da Atividade */}
-                  <div className="col-span-1 md:col-span-3 flex justify-between md:block items-center border-b border-gray-100 md:border-none py-2 md:py-0">
-                    <span className="text-xs font-medium text-gray-500 md:hidden uppercase">Nome da Atividade</span>
+                  <div className="col-span-1 md:col-span-3 flex justify-between md:block items-start md:items-center gap-4 border-b border-gray-100 md:border-none py-2 md:py-0">
+                    <span className="text-xs font-medium text-gray-500 md:hidden uppercase mt-0.5 min-w-[120px]">Nome da Ativ.</span>
                     <span className="text-sm font-bold md:font-medium text-gray-900 text-right md:text-left line-clamp-2 md:line-clamp-none">{atividade.atividade_nome}</span>
                   </div>
 
                   {/* Oficina */}
-                  <div className="col-span-1 md:col-span-3 flex justify-between md:block items-center border-b border-gray-100 md:border-none py-2 md:py-0">
-                    <span className="text-xs font-medium text-gray-500 md:hidden uppercase">Oficina</span>
-                    <span className="text-sm text-gray-500">{atividade.oficina}</span>
+                  <div className="col-span-1 md:col-span-3 flex justify-between md:block items-start md:items-center gap-4 border-b border-gray-100 md:border-none py-2 md:py-0">
+                    <span className="text-xs font-medium text-gray-500 md:hidden uppercase mt-0.5 min-w-[80px]">Oficina</span>
+                    <span className="text-sm text-gray-500 text-right md:text-left">{atividade.oficina}</span>
                   </div>
 
                   {/* Local */}
-                  <div className="col-span-1 md:col-span-2 flex justify-between md:block items-center border-b border-gray-100 md:border-none py-2 md:py-0">
-                    <span className="text-xs font-medium text-gray-500 md:hidden uppercase">Local</span>
-                    <span className="text-sm text-gray-500">{atividade.local}</span>
+                  <div className="col-span-1 md:col-span-2 flex justify-between md:block items-start md:items-center gap-4 border-b border-gray-100 md:border-none py-2 md:py-0">
+                    <span className="text-xs font-medium text-gray-500 md:hidden uppercase mt-0.5 min-w-[80px]">Local</span>
+                    <span className="text-sm text-gray-500 text-right md:text-left">{atividade.local}</span>
                   </div>
 
                   {/* Ações */}
                   <div className="col-span-1 md:col-span-2 flex justify-end md:justify-end items-center gap-2 pt-2 md:pt-0">
                     <button 
-                      onClick={() => handleDownloadPDF(atividade.id)}
-                      className="p-1.5 md:p-2 text-green-600 hover:bg-green-50 rounded-md transition" 
+                      onClick={(e) => { e.stopPropagation(); handleDownloadPDF(atividade.id); }}
+                      className="p-1.5 md:p-2 text-green-600 hover:bg-green-100 rounded-md transition" 
                       title="Gerar PDF"
                     >
                       <FileText size={18} />
                     </button>
                     <button 
-                      onClick={() => handleDuplicate(atividade.id)}
-                      className="p-1.5 md:p-2 text-indigo-600 hover:bg-indigo-50 rounded-md transition" 
+                      onClick={(e) => { e.stopPropagation(); handleDuplicate(atividade.id); }}
+                      className="p-1.5 md:p-2 text-indigo-600 hover:bg-indigo-100 rounded-md transition" 
                       title="Duplicar"
                     >
                       <Copy size={18} />
                     </button>
-                    <Link 
-                      to={`/atividade/${atividade.id}`} 
-                      className="p-1.5 md:p-2 text-blue-600 hover:bg-blue-50 rounded-md transition" 
-                      title="Ver / Editar"
-                    >
-                      <Edit2 size={18} />
-                    </Link>
                     <button 
-                      onClick={() => handleDelete(atividade.id)}
-                      className="p-1.5 md:p-2 text-red-600 hover:bg-red-50 rounded-md transition" 
+                      onClick={(e) => { e.stopPropagation(); handleDelete(atividade.id); }}
+                      className="p-1.5 md:p-2 text-red-600 hover:bg-red-100 rounded-md transition" 
                       title="Excluir"
                     >
                       <Trash2 size={18} />

@@ -157,19 +157,19 @@ export default function Utentes() {
               {utentes.map((utente) => (
                 <div key={utente.id} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-white rounded-lg md:rounded-none shadow-sm md:shadow-none p-4 md:px-6 md:py-4 hover:bg-gray-50 transition border border-gray-200 md:border-none">
                   {/* Nome */}
-                  <div className="col-span-1 md:col-span-4 flex justify-between md:block items-center border-b border-gray-100 md:border-none pb-2 md:pb-0">
-                    <span className="text-xs font-medium text-gray-500 md:hidden uppercase">Nome</span>
-                    <span className="text-sm text-gray-900 font-medium md:font-normal">{utente.nome}</span>
+                  <div className="col-span-1 md:col-span-4 flex justify-between md:block items-start md:items-center gap-4 border-b border-gray-100 md:border-none pb-2 md:pb-0">
+                    <span className="text-xs font-medium text-gray-500 md:hidden uppercase mt-0.5 min-w-[80px]">Nome</span>
+                    <span className="text-sm text-gray-900 font-medium md:font-normal text-right md:text-left">{utente.nome}</span>
                   </div>
                   
                   {/* Apelido */}
-                  <div className="col-span-1 md:col-span-4 flex justify-between md:block items-center border-b border-gray-100 md:border-none py-2 md:py-0">
-                    <span className="text-xs font-medium text-gray-500 md:hidden uppercase">Apelido</span>
-                    <span className="text-sm text-gray-900">{utente.apelido}</span>
+                  <div className="col-span-1 md:col-span-4 flex justify-between md:block items-start md:items-center gap-4 border-b border-gray-100 md:border-none py-2 md:py-0">
+                    <span className="text-xs font-medium text-gray-500 md:hidden uppercase mt-0.5 min-w-[80px]">Apelido</span>
+                    <span className="text-sm text-gray-500 text-right md:text-left">{utente.apelido}</span>
                   </div>
 
                   {/* Estado */}
-                  <div className="col-span-1 md:col-span-2 flex justify-between md:justify-center items-center border-b border-gray-100 md:border-none py-2 md:py-0">
+                  <div className="col-span-1 md:col-span-2 flex justify-between md:block items-center md:justify-center border-b border-gray-100 md:border-none py-2 md:py-0">
                     <span className="text-xs font-medium text-gray-500 md:hidden uppercase">Estado</span>
                     <div>
                       {utente.ativo ? (
