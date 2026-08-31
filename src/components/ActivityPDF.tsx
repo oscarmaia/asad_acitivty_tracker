@@ -225,7 +225,7 @@ export const ActivityPDF = ({ atividade, avaliacoes }: ActivityPDFProps) => {
           {avaliacoes.map((av, index) => (
             <View style={styles.row} key={index}>
               <View style={[styles.utentesCellLeft, { width: '25%' }]}>
-                <Text>{av.utentes?.apelido}</Text>
+                <Text>{av.utentes?.alcunha}</Text>
               </View>
               <View style={[styles.utentesCell, { width: '15%' }]}>
                 <Text>X</Text>

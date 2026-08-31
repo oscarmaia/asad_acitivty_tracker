@@ -14,7 +14,7 @@ export default function Utentes() {
   
   // Estado para o formulário / edição inline ou modal
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<UtenteData>({ nome: '', apelido: '', ativo: true });
+  const [formData, setFormData] = useState<UtenteData>({ nome: '', alcunha: '', ativo: true });
   const [isAdding, setIsAdding] = useState(false);
 
   const loadUtentes = async () => {
@@ -43,7 +43,7 @@ export default function Utentes() {
   const handleAdd = () => {
     setEditingId(null);
     setIsAdding(true);
-    setFormData({ nome: '', apelido: '', ativo: true });
+    setFormData({ nome: '', alcunha: '', ativo: true });
   };
 
   const handleCancel = () => {
@@ -52,8 +52,8 @@ export default function Utentes() {
   };
 
   const handleSave = async () => {
-    if (!formData.nome || !formData.apelido) {
-      toast.error('Preencha o nome e o apelido.');
+    if (!formData.nome || !formData.alcunha) {
+      toast.error('Preencha o nome e a alcunha.');
       return;
     }
     
@@ -71,7 +71,7 @@ export default function Utentes() {
   const filteredUtentes = utentes.filter(
     (u) =>
       u.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.apelido.toLowerCase().includes(searchTerm.toLowerCase())
+      u.alcunha.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -127,12 +127,12 @@ export default function Utentes() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Apelido</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Alcunha</label>
                 <input
                   type="text"
                   className="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  value={formData.apelido}
-                  onChange={(e) => setFormData({ ...formData, apelido: e.target.value })}
+                  value={formData.alcunha}
+                  onChange={(e) => setFormData({ ...formData, alcunha: e.target.value })}
                 />
               </div>
               <div className="flex items-center md:mt-6">
@@ -173,7 +173,7 @@ export default function Utentes() {
           <div className="bg-transparent md:bg-white md:rounded-lg md:shadow overflow-hidden">
             <div className="hidden md:grid md:grid-cols-12 gap-4 bg-gray-50 px-6 py-3 border-b text-xs font-medium text-gray-500 uppercase tracking-wider">
               <div className="col-span-4">Nome</div>
-              <div className="col-span-4">Apelido</div>
+              <div className="col-span-4">Alcunha</div>
               <div className="col-span-2 text-center">Estado</div>
               <div className="col-span-2 text-right">Ações</div>
             </div>
@@ -187,10 +187,10 @@ export default function Utentes() {
                     <span className="text-sm text-gray-900 font-medium md:font-normal text-right md:text-left">{utente.nome}</span>
                   </div>
                   
-                  {/* Apelido */}
+                  {/* Alcunha */}
                   <div className="col-span-1 md:col-span-4 flex justify-between md:block items-start md:items-center gap-4 border-b border-gray-100 md:border-none py-2 md:py-0">
-                    <span className="text-xs font-medium text-gray-500 md:hidden uppercase mt-0.5 min-w-[80px]">Apelido</span>
-                    <span className="text-sm text-gray-500 text-right md:text-left">{utente.apelido}</span>
+                    <span className="text-xs font-medium text-gray-500 md:hidden uppercase mt-0.5 min-w-[80px]">Alcunha</span>
+                    <span className="text-sm text-gray-500 text-right md:text-left">{utente.alcunha}</span>
                   </div>
 
                   {/* Estado */}

@@ -57,7 +57,7 @@ export const atividadesService = {
         *,
         utentes (
           nome,
-          apelido
+          alcunha
         )
       `)
       .eq('atividade_id', id);

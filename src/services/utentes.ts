@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase/client';
 export type UtenteData = {
   id?: string;
   nome: string;
-  apelido: string;
+  alcunha: string;
   ativo: boolean;
 };
 
@@ -22,7 +22,7 @@ export const utentesService = {
     if (utente.id) {
       const { data, error } = await supabase
         .from('utentes')
-        .update({ nome: utente.nome, apelido: utente.apelido, ativo: utente.ativo })
+        .update({ nome: utente.nome, alcunha: utente.alcunha, ativo: utente.ativo })
         .eq('id', utente.id)
         .select()
         .single();
@@ -31,7 +31,7 @@ export const utentesService = {
     } else {
       const { data, error } = await supabase
         .from('utentes')
-        .insert([{ nome: utente.nome, apelido: utente.apelido, ativo: utente.ativo ?? true }])
+        .insert([{ nome: utente.nome, alcunha: utente.alcunha, ativo: utente.ativo ?? true }])
         .select()
         .single();
       if (error) throw error;

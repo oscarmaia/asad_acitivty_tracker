@@ -14,7 +14,7 @@ Por favor, gere as *migrations* ou as *queries* SQL para criar as seguintes tabe
 - **`utentes`**:
   - `id` (UUID, PK)
   - `nome` (Text)
-  - `apelido` (Text)
+  - `alcunha` (Text)
   - `ativo` (Boolean, default true)
 
 - **`atividades`**:

@@ -403,7 +403,7 @@ export default function ActivityForm() {
                             (av, avIndex) => avIndex !== index && av.utente_id === u.id
                           );
                           if (isSelectedInOtherRow) return null;
-                          return <option key={u.id} value={u.id}>{u.apelido}</option>;
+                          return <option key={u.id} value={u.id}>{u.alcunha}</option>;
                         })}
                       </select>
                     </div>

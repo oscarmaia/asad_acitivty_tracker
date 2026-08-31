@@ -5,7 +5,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE TABLE IF NOT EXISTS utentes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   nome TEXT NOT NULL,
-  apelido TEXT NOT NULL,
+  alcunha TEXT NOT NULL,
   ativo BOOLEAN DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -61,7 +61,7 @@ CREATE POLICY "Autenticados podem atualizar avaliacoes" ON avaliacoes FOR UPDATE
 CREATE POLICY "Autenticados podem apagar avaliacoes" ON avaliacoes FOR DELETE TO authenticated USING (true);
 
 -- Dados dummy para Utentes (opcional, para testar)
-INSERT INTO utentes (nome, apelido) VALUES
+INSERT INTO utentes (nome, alcunha) VALUES
   ('Mônica', 'Moki'),
   ('Suzana', 'Suzaninha'),
   ('Conceição', 'Sãozinha');
