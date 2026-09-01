@@ -69,7 +69,6 @@ export default function ActivityForm() {
           const { atividade } = await atividadesService.getAtividade(state.cloneFrom);
           reset({
             ...atividade,
-            data: format(new Date(), 'yyyy-MM-dd'),
             avaliacoes: [],
           });
         } catch (err) {
@@ -145,10 +144,9 @@ export default function ActivityForm() {
 
   const duplicarAtividade = () => {
     const dados = getValues();
-    // Limpar data e avaliações, manter textos base
+    // Limpar avaliações, manter textos base e data
     reset({
       ...dados,
-      data: format(new Date(), 'yyyy-MM-dd'),
       avaliacoes: [],
     });
     navigate('/atividade/nova');
