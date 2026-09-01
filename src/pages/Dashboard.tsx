@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { atividadesService } from '../services/atividades';
 import { Link, useNavigate } from 'react-router-dom';
-import { LogOut, PlusCircle, Search, Copy, Trash2, FileText } from 'lucide-react';
+import { LogOut, PlusCircle, Search, Copy, Trash2, FileText, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { pdf } from '@react-pdf/renderer';
@@ -150,7 +150,7 @@ export default function Dashboard() {
                 <div 
                   key={atividade.id} 
                   onClick={() => navigate(`/atividade/${atividade.id}`)}
-                  className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-white rounded-lg md:rounded-none shadow-sm md:shadow-none p-4 md:px-6 md:py-4 hover:bg-blue-50 cursor-pointer transition border border-gray-200 md:border-none"
+                  className={`grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-white rounded-lg md:rounded-none shadow-sm md:shadow-none p-4 md:px-6 md:py-4 hover:bg-blue-50 cursor-pointer transition ${!atividade.avaliacoes || atividade.avaliacoes.length === 0 ? 'border-l-4 border-l-red-500 border-y border-r border-gray-200 md:border-y-gray-200 md:border-r-transparent' : 'border border-gray-200 md:border-transparent md:border-b-gray-200'}`}
                 >
                   {/* Data */}
                   <div className="col-span-1 md:col-span-2 flex justify-between md:block items-start md:items-center gap-4 border-b border-gray-100 md:border-none pb-2 md:pb-0">
@@ -178,6 +178,15 @@ export default function Dashboard() {
 
                   {/* Ações */}
                   <div className="col-span-1 md:col-span-2 flex justify-end md:justify-end items-center gap-2 pt-2 md:pt-0">
+                    {(!atividade.avaliacoes || atividade.avaliacoes.length === 0) && (
+                      <div 
+                        className="p-1.5 md:p-2 text-red-500 flex items-center cursor-help" 
+                        title="Não há utentes nesta atividade!"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <AlertCircle size={20} />
+                      </div>
+                    )}
                     <button 
                       onClick={(e) => { e.stopPropagation(); handleDownloadPDF(atividade.id); }}
                       className="p-1.5 md:p-2 text-green-600 hover:bg-green-100 rounded-md transition" 

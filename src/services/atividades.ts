@@ -24,7 +24,7 @@ export const atividadesService = {
   async getAtividades() {
     const { data, error } = await supabase
       .from('atividades')
-      .select('*')
+      .select('*, avaliacoes(id)')
       .order('data', { ascending: false });
     
     if (error) throw error;
