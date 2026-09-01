@@ -4,7 +4,7 @@ import { utentesService } from '../services/utentes';
 import type { UtenteData } from '../services/utentes';
 import { Link } from 'react-router-dom';
 import { Edit2, PlusCircle, Check, X, Save, LogOut, Search } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 export default function Utentes() {
   const { signOut, user } = useAuth();

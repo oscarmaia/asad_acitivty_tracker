@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { ArrowLeft, Save, Copy, FileText, Plus, Trash2 } from 'lucide-react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { atividadesService } from '../services/atividades';
 import type { AtividadeData } from '../services/atividades';
 import { ActivityPDF } from '../components/ActivityPDF';
@@ -171,31 +171,17 @@ export default function ActivityForm() {
   };
 
   const handleDelete = () => {
-    toast(
-      (t) => (
-        <div>
-          <p className="mb-3 font-medium text-gray-800">Tem a certeza que deseja excluir esta atividade?</p>
-          <div className="flex justify-end gap-2">
-            <button
-              onClick={() => toast.dismiss(t.id)}
-              className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-gray-200 font-medium transition"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={() => {
-                toast.dismiss(t.id);
-                executeDelete();
-              }}
-              className="px-3 py-1.5 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 font-medium transition"
-            >
-              Excluir
-            </button>
-          </div>
-        </div>
-      ),
-      { duration: 10000 }
-    );
+    toast('Tem a certeza que deseja excluir esta atividade?', {
+      duration: 10000,
+      action: {
+        label: 'Excluir',
+        onClick: () => executeDelete(),
+      },
+      cancel: {
+        label: 'Cancelar',
+        onClick: () => {},
+      },
+    });
   };
 
   if (pageLoading) {

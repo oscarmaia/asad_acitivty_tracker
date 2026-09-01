@@ -4,7 +4,7 @@ import { atividadesService } from '../services/atividades';
 import { Link, useNavigate } from 'react-router-dom';
 import { LogOut, PlusCircle, Search, Copy, Trash2, FileText } from 'lucide-react';
 import { format } from 'date-fns';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { pdf } from '@react-pdf/renderer';
 import { ActivityPDF } from '../components/ActivityPDF';
 import { getPdfFilename } from '../utils/pdfHelper';
@@ -47,31 +47,17 @@ export default function Dashboard() {
   };
 
   const handleDelete = (id: string) => {
-    toast(
-      (t) => (
-        <div>
-          <p className="mb-3 font-medium text-gray-800">Tem a certeza que deseja excluir esta atividade?</p>
-          <div className="flex justify-end gap-2">
-            <button
-              onClick={() => toast.dismiss(t.id)}
-              className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-gray-200 font-medium transition"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={() => {
-                toast.dismiss(t.id);
-                executeDelete(id);
-              }}
-              className="px-3 py-1.5 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 font-medium transition"
-            >
-              Excluir
-            </button>
-          </div>
-        </div>
-      ),
-      { duration: 10000 }
-    );
+    toast('Tem a certeza que deseja excluir esta atividade?', {
+      duration: 10000,
+      action: {
+        label: 'Excluir',
+        onClick: () => executeDelete(id),
+      },
+      cancel: {
+        label: 'Cancelar',
+        onClick: () => {},
+      },
+    });
   };
 
   const handleDuplicate = (id: string) => {

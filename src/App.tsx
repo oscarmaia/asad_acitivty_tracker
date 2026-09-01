@@ -4,7 +4,7 @@ import Login from './pages/Login';
 import ActivityForm from './pages/ActivityForm';
 import Utentes from './pages/Utentes';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from 'sonner';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { session, loading } = useAuth();
@@ -23,7 +23,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 function App() {
   return (
     <AuthProvider>
-      <Toaster position="top-center" />
+      <Toaster position="top-center" richColors />
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
