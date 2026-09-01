@@ -138,7 +138,7 @@ interface ActivityPDFProps {
 export const ActivityPDF = ({ atividade, avaliacoes }: ActivityPDFProps) => {
   return (
     <Document>
-      <Page size="A4" orientation="landscape" style={styles.page}>
+      <Page size="A4" orientation="portrait" style={styles.page}>
         <View style={styles.headerTop}>
           <Text style={styles.headerText}>Associação Social de Apoio à Deficiência</Text>
           <Image src="/asad.jpg" style={styles.logo} />
