@@ -170,7 +170,7 @@ export default function ActivityForm() {
 
   const handleDelete = () => {
     toast('Tem a certeza que deseja excluir esta atividade?', {
-      duration: 10000,
+      duration: 1000,
       action: {
         label: 'Excluir',
         onClick: () => executeDelete(),

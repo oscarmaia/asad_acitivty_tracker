@@ -23,7 +23,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 function App() {
   return (
     <AuthProvider>
-      <Toaster position="top-center" richColors />
+      <Toaster position="top-center" richColors duration={1000} />
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />

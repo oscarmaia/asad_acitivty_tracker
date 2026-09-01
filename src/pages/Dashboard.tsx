@@ -48,7 +48,7 @@ export default function Dashboard() {
 
   const handleDelete = (id: string) => {
     toast('Tem a certeza que deseja excluir esta atividade?', {
-      duration: 10000,
+      duration: 1000,
       action: {
         label: 'Excluir',
         onClick: () => executeDelete(id),
